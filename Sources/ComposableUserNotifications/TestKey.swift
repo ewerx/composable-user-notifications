@@ -1,7 +1,7 @@
 import Dependencies
 import Foundation
 import UserNotifications
-import XCTestDynamicOverlay
+import IssueReporting
 
 extension DependencyValues {
   public var userNotifications: UserNotificationClient {
@@ -16,10 +16,10 @@ extension UserNotificationClient: TestDependencyKey {
   #if os(iOS) || os(macOS) || os(watchOS) || targetEnvironment(macCatalyst)
     public static let testValue = Self(
       add: unimplemented("\(Self.self).add"),
-      deliveredNotifications: unimplemented("\(Self.self).deliveredNotifications"),
+      deliveredNotifications: unimplemented("\(Self.self).deliveredNotifications", placeholder: []),
       notificationCategories: unimplemented("\(Self.self).notificationCategories", placeholder: []),
       notificationSettings: unimplemented("\(Self.self).notificationSettings"),
-      pendingNotificationRequests: unimplemented("\(Self.self).pendingNotificationRequests"),
+      pendingNotificationRequests: unimplemented("\(Self.self).pendingNotificationRequests", placeholder: []),
       removeAllDeliveredNotifications: unimplemented(
         "\(Self.self).removeAllDeliveredNotifications"),
       removeAllPendingNotificationRequests: unimplemented(

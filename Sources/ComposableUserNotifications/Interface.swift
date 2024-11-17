@@ -1,5 +1,5 @@
 import UserNotifications
-import XCTestDynamicOverlay
+import IssueReporting
 
 /// A wrapper around UserNotifications's `UNUserNotificationCenter` that exposes its functionality through
 /// effects and actions, making it easy to use with the Composable Architecture and easy to test.
@@ -28,19 +28,25 @@ public struct UserNotificationClient {
 
   #if !os(tvOS)
     public var deliveredNotifications: @Sendable () async -> [Notification] = unimplemented(
-      "\(Self.self).deliveredNotifications")
+      "\(Self.self).deliveredNotifications",
+      placeholder: []
+    )
   #endif
 
   #if !os(tvOS)
     public var notificationCategories: () async -> Set<UNNotificationCategory> = unimplemented(
-      "\(Self.self).deliveredNotifications")
+      "\(Self.self).deliveredNotifications",
+      placeholder: Set<UNNotificationCategory>()
+    )
   #endif
 
-  public var notificationSettings: () async -> Notification.Settings = unimplemented(
+  public var notificationSettings: @Sendable () async throws -> Notification.Settings = unimplemented(
     "\(Self.self).notificationSettings")
 
   public var pendingNotificationRequests: () async -> [Notification.Request] = unimplemented(
-    "\(Self.self).pendingNotificationRequests")
+    "\(Self.self).pendingNotificationRequests",
+    placeholder: []
+  )
 
   #if !os(tvOS)
     public var removeAllDeliveredNotifications: () async -> Void = unimplemented(
@@ -66,7 +72,7 @@ public struct UserNotificationClient {
       unimplemented("\(Self.self).setNotificationCategories")
   #endif
 
-  public var supportsContentExtensions: () -> Bool = unimplemented(
+  public var supportsContentExtensions: @Sendable () throws -> Bool = unimplemented(
     "\(Self.self).supportsContentExtensions")
 
   /// This Effect represents calls to the `UNUserNotificationCenterDelegate`.

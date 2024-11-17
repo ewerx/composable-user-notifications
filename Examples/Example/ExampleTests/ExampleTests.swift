@@ -8,20 +8,20 @@ import XCTest
 class ExampleTests: XCTestCase {
   func testApplicationLaunchWithoutNotification() async throws {
     let delegate = AsyncStream<UserNotificationClient.DelegateAction>.makeStream()
-    let requestedAuthorizationOptions = ActorIsolated<UNAuthorizationOptions?>(nil)
+    let requestedAuthorizationOptions = LockIsolated<UNAuthorizationOptions?>(nil)
     let store = TestStore(
       initialState: App.State(count: nil),
       reducer: { App() }
     )
     store.dependencies.userNotifications.delegate = { delegate.stream }
     store.dependencies.userNotifications.requestAuthorization = { options in
-      await requestedAuthorizationOptions.setValue(options)
+      requestedAuthorizationOptions.setValue(options)
       return true
     }
     let task = await store.send(.didFinishLaunching)
     await store.receive(.requestAuthorizationResponse(.success(true)))
-    await requestedAuthorizationOptions.withValue {
-      XCTAssertNoDifference($0, [.alert, .badge, .sound])
+    requestedAuthorizationOptions.withValue {
+      expectNoDifference($0, [.alert, .badge, .sound])
     }
     await task.cancel()
   }
@@ -66,7 +66,7 @@ class ExampleTests: XCTestCase {
         )
       )
     )
-    XCTAssertNoDifference(notificationPresentationOptions, [.list, .banner, .sound])
+    expectNoDifference(notificationPresentationOptions, [.list, .banner, .sound])
     await task.cancel()
   }
 
@@ -136,7 +136,7 @@ class ExampleTests: XCTestCase {
     await store.receive(.remoteCountResponse(.success(5))) {
       $0.count = 5
     }
-    XCTAssertNoDifference(backgroundFetchResult, .newData)
+    expectNoDifference(backgroundFetchResult, .newData)
   }
 
   func testReceiveBackgroundNotificationFailure() async throws {
@@ -156,7 +156,7 @@ class ExampleTests: XCTestCase {
 
     await store.send(.didReceiveBackgroundNotification(backgroundNotification))
     await store.receive(.remoteCountResponse(.failure(Error())))
-    XCTAssertNoDifference(backgroundFetchResult, .failed)
+    expectNoDifference(backgroundFetchResult, .failed)
   }
 
   func testReceiveBackgroundNotificationWithoutContent() async throws {
@@ -173,7 +173,7 @@ class ExampleTests: XCTestCase {
     )
 
     await store.send(.didReceiveBackgroundNotification(backgroundNotification))
-    XCTAssertNoDifference(backgroundFetchResult, .noData)
+    expectNoDifference(backgroundFetchResult, .noData)
   }
 
   func testTappedScheduleButton() async throws {
@@ -182,22 +182,22 @@ class ExampleTests: XCTestCase {
       reducer: { App() }
     )
 
-    let notificationRequest = ActorIsolated<UNNotificationRequest?>(nil)
-    let removedPendingIdentifiers = ActorIsolated<[String]?>(nil)
+    let notificationRequest = LockIsolated<UNNotificationRequest?>(nil)
+    let removedPendingIdentifiers = LockIsolated<[String]?>(nil)
 
     store.dependencies.userNotifications.add = { request in
-      await notificationRequest.setValue(request)
+      notificationRequest.setValue(request)
     }
     store.dependencies.userNotifications.removePendingNotificationRequestsWithIdentifiers = { identifiers in
-      await removedPendingIdentifiers.setValue(identifiers)
+      removedPendingIdentifiers.setValue(identifiers)
     }
 
     await store.send(.tappedScheduleButton)
     await store.receive(.addNotificationResponse(.success(Unit())))
-    await removedPendingIdentifiers.withValue {
-      XCTAssertNoDifference($0, ["example_notification"])
+    removedPendingIdentifiers.withValue {
+      expectNoDifference($0, ["example_notification"])
     }
-    await notificationRequest.withValue {
+    notificationRequest.withValue {
       XCTAssertEqual($0?.content.title, "Example title")
       XCTAssertEqual($0?.content.body, "Example body")
       XCTAssertTrue($0?.trigger is UNTimeIntervalNotificationTrigger)

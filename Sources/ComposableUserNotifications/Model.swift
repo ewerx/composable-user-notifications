@@ -1,6 +1,6 @@
 import CoreLocation
 import UserNotifications
-import XCTestDynamicOverlay
+import IssueReporting
 
 public struct Notification: Equatable {
   public let rawValue: UNNotification?
@@ -321,12 +321,12 @@ extension Notification.Response {
 
 extension Notification {
   public struct Settings: Equatable {
-    public var rawValue: () -> UNNotificationSettings? = unimplemented("rawValue")
+    public var rawValue: () -> UNNotificationSettings? = unimplemented("rawValue", placeholder: nil)
 
     @available(tvOS, unavailable)
     public var alertSetting: UNNotificationSetting { _alertSetting() }
     @_spi(Internal)
-    public var _alertSetting: () -> UNNotificationSetting = unimplemented("alertSetting")
+    public var _alertSetting: () -> UNNotificationSetting = unimplemented("alertSetting", placeholder: .notSupported)
 
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
@@ -339,7 +339,7 @@ extension Notification {
     }
     #if !os(tvOS) && !os(watchOS)
       @_spi(Internal)
-      public var _alertStyle: () -> UNAlertStyle = unimplemented("alertStyle")
+    public var _alertStyle: () -> UNAlertStyle = unimplemented("alertStyle", placeholder: .none)
     #endif
 
     @available(macOS, unavailable)
@@ -347,50 +347,55 @@ extension Notification {
     public var announcementSetting: UNNotificationSetting { _announcementSetting() }
     @_spi(Internal)
     public var _announcementSetting: () -> UNNotificationSetting = unimplemented(
-      "announcementSetting"
+      "announcementSetting",
+      placeholder: .notSupported
     )
 
     public var authorizationStatus: () -> UNAuthorizationStatus = unimplemented(
-      "authorizationStatus"
+      "authorizationStatus",
+      placeholder: .notDetermined
     )
 
     @available(watchOS, unavailable)
     public var badgeSetting: UNNotificationSetting { _badgeSetting() }
     @_spi(Internal)
-    public var _badgeSetting: () -> UNNotificationSetting = unimplemented("badgeSetting")
+    public var _badgeSetting: () -> UNNotificationSetting = unimplemented("badgeSetting", placeholder: .notSupported)
 
     @available(macOS, unavailable)
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public var carPlaySetting: UNNotificationSetting { _carPlaySetting() }
     @_spi(Internal)
-    public var _carPlaySetting: () -> UNNotificationSetting = unimplemented("carPlaySetting")
+    public var _carPlaySetting: () -> UNNotificationSetting = unimplemented("carPlaySetting", placeholder: .notSupported)
 
     @available(tvOS, unavailable)
     public var criticalAlertSetting: UNNotificationSetting { _criticalAlertSetting() }
     @_spi(Internal)
     public var _criticalAlertSetting: () -> UNNotificationSetting = unimplemented(
-      "criticalAlertSetting"
+      "criticalAlertSetting",
+      placeholder: .notSupported
     )
 
     @available(tvOS, unavailable)
     @available(watchOS, unavailable)
     public var lockScreenSetting: UNNotificationSetting { _lockScreenSetting() }
     @_spi(Internal)
-    public var _lockScreenSetting: () -> UNNotificationSetting = unimplemented("lockScreenSetting")
+    public var _lockScreenSetting: () -> UNNotificationSetting = unimplemented("lockScreenSetting", placeholder: .notSupported)
 
     @available(tvOS, unavailable)
     public var notificationCenterSetting: UNNotificationSetting { _notificationCenterSetting() }
     @_spi(Internal)
     public var _notificationCenterSetting: () -> UNNotificationSetting = unimplemented(
-      "notificationCenterSetting"
+      "notificationCenterSetting",
+      placeholder: .notSupported
     )
 
     @available(tvOS, unavailable)
     public var providesAppNotificationSettings: Bool { _providesAppNotificationSettings() }
     @_spi(Internal)
     public var _providesAppNotificationSettings: () -> Bool = unimplemented(
-      "providesAppNotificationSettings"
+      "providesAppNotificationSettings",
+      placeholder: false
     )
 
     @available(tvOS, unavailable)
@@ -405,14 +410,15 @@ extension Notification {
     #if !os(tvOS) && !os(watchOS)
       @_spi(Internal)
       public var _showPreviewsSetting: () -> UNShowPreviewsSetting = unimplemented(
-        "showPreviewsSetting"
+        "showPreviewsSetting",
+        placeholder: .never
       )
     #endif
 
     @available(tvOS, unavailable)
     public var soundSetting: UNNotificationSetting { _soundSetting() }
     @_spi(Internal)
-    public var _soundSetting: () -> UNNotificationSetting = unimplemented("soundSetting")
+    public var _soundSetting: () -> UNNotificationSetting = unimplemented("soundSetting", placeholder: .notSupported)
 
     public init(rawValue: UNNotificationSettings) {
       self.rawValue = { rawValue }
